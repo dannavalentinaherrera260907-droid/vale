@@ -1,6 +1,7 @@
 #include <iostream>
 using namespace std;
 
+//Danna Valentina Herrera y Juan Esteban Guamán
 int main() {
     int n;
 
