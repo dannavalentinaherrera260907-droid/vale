@@ -8,7 +8,7 @@
 using namespace std;
 
 //Danna Valentina Herrera Ortiz y Juan Esteban Guamán Lancheros
-// Definimos un tipo de callback: función que recibe dos floats y retorna un float
+
 using Operation = function<float(float, float)>;
 
 int main(int argc, char* argv[]) {
@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
         string op = argv[2];
         float num2 = stof(argv[3]);
 
-        // Definimos operaciones disponibles
+        
         map<string, Operation> operaciones;
         operaciones["+"] = [](float a, float b) { return a + b; };
         operaciones["-"] = [](float a, float b) { return a - b; };
