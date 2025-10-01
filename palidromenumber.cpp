@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <string>
 #include <functional>
@@ -6,6 +7,7 @@
 
 using namespace std;
 
+//Danna Valentina Herrera Ortiz y Juan Esteban Guamán Lancheros
 // Definimos un tipo de callback: función que recibe dos floats y retorna un float
 using Operation = function<float(float, float)>;
 
