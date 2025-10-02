@@ -1,0 +1,23 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Compilar C++ con g++",
+            "type": "shell",
+            "command": "g++",
+            "args": [
+                "-g",
+                "code.cpp",
+                "-o",
+                "mi_programa"
+            ]
+            ,
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$gcc"],
+            "detail": "Tarea para compilar un archivo C++ usando g++"
+        }
+    ]
+}
