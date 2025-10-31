@@ -1,0 +1,4 @@
+REPORTE DE CONSUMO DE DISPOSITIVOS
+----------------------------------
+ID: 1 | Nombre: Luz sala | Consumo total: 150 Wh
+ID: 2 | Nombre: Televisor | Consumo total: 482 Wh
