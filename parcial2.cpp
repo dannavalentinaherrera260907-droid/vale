@@ -1,8 +1,16 @@
 //Danna Valentina Herrera y Juan Esteban Guaman
+/**
+ * parcial2.cpp
+ * Simulación de dispositivos inteligentes (entrada, simulación y reporte).
+ */
+
 #include <iostream>
 #include <string>
 #include <vector>
 #include <fstream>
+#include <cstdlib>
+#include <ctime>
+
 using namespace std;
 
 /**
@@ -10,136 +18,151 @@ using namespace std;
  */
 class DispositivoInteligente {
 private:
-    string nombre;          ///< Nombre del dispositivo
-    bool estado;            ///< Estado (true encendido / false apagado)
-    float consumoEnergia;   ///< Consumo en Wh
-    bool controlBloqueado;  ///< Indica si el control remoto está bloqueado
-    int id;                 ///< Identificador del dispositivo
+    string nombre;
+    bool estado;
+    float consumoEnergia;
+    int id;
+    static int contador;
 
 public:
-    /**
-     * @brief Constructor que inicializa todos los atributos.
-     * @param _id ID del dispositivo.
-     * @param nom Nombre del dispositivo.
-     * @param est Estado inicial (encendido/apagado).
-     * @param consumo Consumo en Wh.
-     */
-    DispositivoInteligente(int _id, string nom, bool est, float consumo) {
-        id = _id;
-        nombre = nom;
-        estado = est;
-        consumoEnergia = consumo;
-        controlBloqueado = false;
+    DispositivoInteligente(string nombre, bool estado, float consumoEnergia)
+        : nombre(nombre), estado(estado), consumoEnergia(consumoEnergia) {
+        id = ++contador;
     }
 
-    /**
-     * @brief Enciende el dispositivo si no está bloqueado.
-     */
-    void encender() {
-        if (!controlBloqueado) {
-            estado = true;
-            cout << nombre << " encendido." << endl;
-        } else {
-            cout << "No se puede encender, control bloqueado." << endl;
-        }
+    void encender() { estado = true; }
+    void apagar()  { estado = false; }
+
+    float simularUso(float horas) const {
+        if (estado) return consumoEnergia * horas;
+        return 0.0f;
     }
 
-    /**
-     * @brief Apaga el dispositivo.
-     */
-    void apagar() {
-        estado = false;
-        cout << nombre << " apagado." << endl;
-    }
-
-    /**
-     * @brief Calcula el consumo total según las horas de uso.
-     * @param horas Tiempo de uso en horas.
-     * @return Energía total consumida (Wh).
-     */
-    float medirConsumo(float horas) {
-        if (estado) {
-            float total = consumoEnergia * horas;
-            cout << nombre << " consumió " << total << " Wh" << endl;
-            return total;
-        } else {
-            cout << nombre << " está apagado, sin consumo." << endl;
-            return 0;
-        }
-    }
-
-    /**
-     * @brief Bloquea el control remoto del dispositivo.
-     */
-    void bloquearControlRemoto() {
-        controlBloqueado = true;
-        cout << "Control remoto bloqueado para " << nombre << endl;
-    }
-
-    /**
-     * @brief Muestra información general del dispositivo.
-     */
-    void mostrarInfo() {
+    void mostrarInfo() const {
         cout << "ID: " << id
              << " | Nombre: " << nombre
              << " | Estado: " << (estado ? "Encendido" : "Apagado")
-             << " | Consumo: " << consumoEnergia << " Wh" << endl;
+             << " | Consumo base: " << consumoEnergia << " W/h" << endl;
     }
 
-    /**
-     * @brief Devuelve el ID del dispositivo.
-     */
-    int getId() { return id; }
-
-    /**
-     * @brief Devuelve el nombre del dispositivo.
-     */
-    string getNombre() { return nombre; }
+    int getId() const { return id; }
+    string getNombre() const { return nombre; }
+    float getConsumoBase() const { return consumoEnergia; }
+    bool getEstado() const { return estado; }
 };
 
-// ---------------------------------------------------------------
-// Aplicación principal (simulación de varios dispositivos)
-// ---------------------------------------------------------------
-int main() {
-    // Crear vector de dispositivos inteligentes
+int DispositivoInteligente::contador = 0;
+
+class SistemaHogar {
+private:
     vector<DispositivoInteligente> dispositivos;
+    vector<float> consumosSimulados; 
 
-    // Agregar algunos dispositivos simulados
-    dispositivos.push_back(DispositivoInteligente(1, "Luz sala", false, 60.0));
-    dispositivos.push_back(DispositivoInteligente(2, "Televisor", true, 120.5));
-
-    // Simular acciones
-    for (auto &d : dispositivos) {
-        d.mostrarInfo();
-        d.encender();
+public:
+    void agregarDispositivo(const DispositivoInteligente &d) {
+        dispositivos.push_back(d);
+        consumosSimulados.push_back(0.0f);
     }
 
-    cout << "\n--- Simulación de consumo ---" << endl;
-
-    // Simular lectura de datos (horas de uso)
-    float horasUso[] = {2.5, 4.0};
-    vector<float> consumosTotales;
-
-    for (size_t i = 0; i < dispositivos.size(); i++) {
-        float energia = dispositivos[i].medirConsumo(horasUso[i]);
-        consumosTotales.push_back(energia);
+    void mostrarDispositivos() const {
+        cout << "\n--- Lista de Dispositivos Inteligentes ---\n";
+        for (const auto &d : dispositivos) d.mostrarInfo();
     }
 
-    // Generar reporte en archivo .txt
-    ofstream reporte("reporte_consumo.txt");
-    if (reporte.is_open()) {
-        reporte << "REPORTE DE CONSUMO DE DISPOSITIVOS\n";
-        reporte << "----------------------------------\n";
-        for (size_t i = 0; i < dispositivos.size(); i++) {
-            reporte << "ID: " << dispositivos[i].getId()
-                    << " | Nombre: " << dispositivos[i].getNombre()
-                    << " | Consumo total: " << consumosTotales[i] << " Wh\n";
+    
+    void simularFlujo() {
+        if (dispositivos.empty()) {
+            cout << "No hay dispositivos para simular.\n";
+            return;
         }
-        reporte.close();
-        cout << "\nReporte generado: reporte_consumo.txt ✅" << endl;
-    } else {
-        cout << "Error al crear el archivo de reporte." << endl;
+
+        cout << "\n--- Simulación de flujo de dispositivos ---\n";
+        srand(static_cast<unsigned>(time(nullptr)));
+
+        for (size_t i = 0; i < dispositivos.size(); ++i) {
+        
+            int horas = 1 + rand() % 5;
+
+            bool estabaEncendido = dispositivos[i].getEstado();
+
+            float consumo = 0.0f;
+            if (estabaEncendido) {
+                consumo = dispositivos[i].simularUso(static_cast<float>(horas));
+                cout << "⚪ " << dispositivos[i].getNombre()
+                     << " (ID " << dispositivos[i].getId() << ") estuvo "
+                     << horas << " h -> consumió " << consumo << " Wh.\n";
+            } else {
+                cout << "⚫ " << dispositivos[i].getNombre()
+                     << " (ID " << dispositivos[i].getId() << ") estaba apagado -> 0 Wh.\n";
+            }
+
+            consumosSimulados[i] = consumo;
+        }
     }
+
+    void generarReporteTxt(const string &ruta = "reporte.txt") const {
+        ofstream archivo(ruta);
+        if (!archivo.is_open()) {
+            cout << "Error: no se pudo crear " << ruta << endl;
+            return;
+        }
+
+        archivo << "REPORTE DE CONSUMO DE DISPOSITIVOS\n";
+        archivo << "----------------------------------\n";
+        for (size_t i = 0; i < dispositivos.size(); ++i) {
+            archivo << "ID: " << dispositivos[i].getId()
+                    << " | Nombre: " << dispositivos[i].getNombre()
+                    << " | Consumo simulado: " << consumosSimulados[i] << " Wh\n";
+        }
+        archivo.close();
+        cout << "\n✅ Reporte generado en '" << ruta << "'.\n";
+    }
+};
+
+int main() {
+    SistemaHogar hogar;
+    int cantidad = 0;
+
+    cout << "¿Cuántos dispositivos desea registrar? ";
+    if (!(cin >> cantidad) || cantidad <= 0) {
+        cout << "Número inválido. Saliendo.\n";
+        return 0;
+    }
+    cin.ignore();
+
+    for (int i = 0; i < cantidad; ++i) {
+        string nombre;
+        int estadoInt;
+        float consumo;
+
+        cout << "\nDispositivo #" << (i + 1) << "\n";
+        cout << "Nombre: ";
+        getline(cin, nombre);
+
+        cout << "¿Está encendido? (1=Sí, 0=No): ";
+        while (!(cin >> estadoInt) || (estadoInt != 0 && estadoInt != 1)) {
+            cin.clear();
+            cin.ignore(10000, '\n');
+            cout << "Ingrese 1 o 0: ";
+        }
+
+        cout << "Consumo en vatios/hora: ";
+        while (!(cin >> consumo) || consumo < 0.0f) {
+            cin.clear();
+            cin.ignore(10000, '\n');
+            cout << "Ingrese un consumo válido (número): ";
+        }
+        cin.ignore();
+
+        DispositivoInteligente d(nombre, estadoInt == 1, consumo);
+        hogar.agregarDispositivo(d);
+    }
+
+    hogar.mostrarDispositivos();
+
+    hogar.simularFlujo();
+
+    hogar.generarReporteTxt("reporte_consumo.txt");
 
     return 0;
 }
