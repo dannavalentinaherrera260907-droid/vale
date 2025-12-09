@@ -1,0 +1,5 @@
+REPORTE DE CONSUMO DE DISPOSITIVOS
+----------------------------------
+ID: 1 | Nombre: Televisor | Consumo simulado: 90 Wh
+ID: 2 | Nombre: celular | Consumo simulado: 0 Wh
+ID: 3 | Nombre: nevera | Consumo simulado: 400 Wh

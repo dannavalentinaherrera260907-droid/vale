@@ -1,0 +1,4 @@
+REPORTE DE DISPOSITIVOS INTELIGENTES
+------------------------------------
+ID: 1 | Nombre: televisor | Consumo: 6 W/h
+ID: 2 | Nombre: nevera | Consumo: 100 W/h
